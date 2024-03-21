@@ -23,7 +23,7 @@ resource "docker_container" "localstack_container" {
     external = 4566
   }
   env = [
-    "SERVICES=s3,sqs,ecs",
+    "SERVICES=s3,sqs,ecs,ecr,iam",
     "DEBUG=1",
     "DATA_DIR=/tmp/localstack/data"
   ]

@@ -1,5 +1,11 @@
 import boto3
 import time
+import logging
+
+# Configure logging
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # SQS and S3 client initialization (configure for LocalStack)
 sqs = boto3.client('sqs', endpoint_url='http://localhost:4566',
@@ -42,7 +48,7 @@ def poll_sqs_and_upload_to_s3():
                 
                 # Delete the message from the queue after processing
                 sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
-                print(f"Uploaded message {msg['MessageId']} to S3 and deleted from SQS.")
+                logger.info(f"Uploaded message {msg['MessageId']} to S3 and deleted from SQS.")
         else:
             # Sleep if there are no messages to avoid flooding the log
             time.sleep(5)

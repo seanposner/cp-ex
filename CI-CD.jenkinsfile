@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define LocalStack ECR endpoint
+        ECR_ENDPOINT = 'http://localhost:4566'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout repository
+                git 'https://github.com/seanposner/cp-ex.git'
+            }
+        }
+
+        stage('Build Docker Image for SQS') {
+            steps {
+                script {
+                    // Build image for SQS service
+                    docker.build('sqs', '-f Dockerfile.sqs .')
+                }
+            }
+        }
+
+        stage('Build Docker Image for ELB') {
+            steps {
+                script {
+                    // Build image for ELB service
+                    docker.build('elb', '-f Dockerfile.elb .')
+                }
+            }
+        }
+
+        stage('Push Image to ECR - SQS') {
+            steps {
+                script {
+                    // Tag and push the SQS image to LocalStack ECR
+                    sh "docker tag sqs:latest ${ECR_ENDPOINT}/sqs:latest"
+                    sh "docker push ${ECR_ENDPOINT}/sqs:latest"
+                }
+            }
+        }
+
+        stage('Push Image to ECR - ELB') {
+            steps {
+                script {
+                    // Tag and push the ELB image to LocalStack ECR
+                    sh "docker tag elb:latest ${ECR_ENDPOINT}/elb:latest"
+                    sh "docker push ${ECR_ENDPOINT}/elb:latest"
+                }
+            }
+        }
+    }
+}
