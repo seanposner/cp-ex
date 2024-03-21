@@ -161,3 +161,6 @@ cython_debug/
 
 .terraform/
 *.hcl
+*.tfstate
+*.backup
+*.info
